@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服列表 - 客服管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f7fafc;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        .nav-breadcrumb {
+            margin-top: 10px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .controls-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .control-group label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+        .control-group select,
+        .control-group input {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+        .control-group select:focus,
+        .control-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        .btn-danger {
+            background: #fc8181;
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .service-table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .service-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .service-table th,
+        .service-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .service-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9em;
+        }
+        .service-table tr:hover {
+            background: #f7fafc;
+        }
+        .service-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .service-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        .service-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 2px;
+        }
+        .service-id {
+            color: #718096;
+            font-size: 0.85em;
+        }
+        .service-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .status-online {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-busy {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        .status-offline {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .tag {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            display: inline-block;
+            margin: 2px;
+        }
+        .action-buttons-cell {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .btn-small.btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-small.btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-small.btn-disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            border: 1px solid #e2e8f0;
+            cursor: not-allowed;
+        }
+        .btn-small:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e0;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+        .back-link:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>客服列表管理</h1>
+        <div class="nav-breadcrumb">
+            <a href="index.html" class="back-link">← 返回主页</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls-section">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label>状态筛选</label>
+                    <select>
+                        <option>全部状态</option>
+                        <option>在线</option>
+                        <option>忙碌</option>
+                        <option>离线</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>所属分组</label>
+                    <select>
+                        <option>全部分组</option>
+                        <option>售前咨询组</option>
+                        <option>售后服务组</option>
+                        <option>VIP客服组</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary">🔍 搜索</button>
+                <button class="btn btn-secondary">👥 批量分组</button>
+                <button class="btn btn-secondary">🔄 批量上线</button>
+                <button class="btn btn-danger">⏸️ 批量下线</button>
+            </div>
+        </div>
+
+        <div class="service-table-container">
+            <table class="service-table">
+                <thead>
+                    <tr>
+                        <th>客服信息</th>
+                        <th>状态</th>
+                        <th>接待量</th>
+                        <th>满意度</th>
+                        <th>所属分组</th>
+                        <th>最后登录</th>
+                        <th>接收聊天</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="service-user">
+                                <div class="service-avatar">张</div>
+                                <div>
+                                    <div class="service-name">张小明</div>
+                                    <div class="service-id">CS001</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="service-status status-online">在线</span></td>
+                        <td>8/15</td>
+                        <td>4.8⭐</td>
+                        <td>售前咨询组</td>
+                        <td>2分钟前</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <div class="action-buttons-cell">
+                                <button class="btn-small btn-primary" onclick="window.open('service-workspace-admin.html', '_blank')">管理员工作台</button>
+                                <button class="btn-small btn-secondary" onclick="showDetails('ADMIN')">详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="service-user">
+                                <div class="service-avatar">李</div>
+                                <div>
+                                    <div class="service-name">李小红</div>
+                                    <div class="service-id">CS002</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="service-status status-busy">忙碌</span></td>
+                        <td>15/15</td>
+                        <td>4.9⭐</td>
+                        <td>VIP客服组</td>
+                        <td>刚刚</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <div class="action-buttons-cell">
+                                <button class="btn-small btn-disabled" disabled>工作台</button>
+                                <button class="btn-small btn-secondary" onclick="showDetails('CS003')">详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="service-user">
+                                <div class="service-avatar">王</div>
+                                <div>
+                                    <div class="service-name">王大伟</div>
+                                    <div class="service-id">CS003</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="service-status status-offline">离线</span></td>
+                        <td>25</td>
+                        <td>4.6⭐</td>
+                        <td>售后服务组</td>
+                        <td>1小时前</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <div class="action-buttons-cell">
+                                <button class="btn-small btn-disabled" disabled>工作台</button>
+                                <button class="btn-small btn-secondary" onclick="showDetails('CS003')">详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="service-user">
+                                <div class="service-avatar">刘</div>
+                                <div>
+                                    <div class="service-name">刘小芳</div>
+                                    <div class="service-id">CS004</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="service-status status-online">在线</span></td>
+                        <td>5/12</td>
+                        <td>4.7⭐</td>
+                        <td>售前咨询组</td>
+                        <td>10分钟前</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <div class="action-buttons-cell">
+                                <button class="btn-small btn-disabled" disabled>工作台</button>
+                                <button class="btn-small btn-secondary" onclick="showDetails('CS003')">详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="service-user">
+                                <div class="service-avatar">管</div>
+                                <div>
+                                    <div class="service-name">管理员（您）</div>
+                                    <div class="service-id">ADMIN</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="service-status status-online">在线</span></td>
+                        <td>0/10</td>
+                        <td>-</td>
+                        <td>管理组</td>
+                        <td>刚刚</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                        <td>
+                            <div class="action-buttons-cell">
+                                <button class="btn-small btn-primary" onclick="window.open('service-workspace-admin.html', '_blank')">管理员工作台</button>
+                                <button class="btn-small btn-secondary" onclick="showDetails('ADMIN')">详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function showDetails(staffId) {
+            // 根据不同的客服ID显示不同的详情信息
+            const staffDetails = {
+                'CS001': {
+                    name: '张小明',
+                    id: 'CS001',
+                    department: '售前咨询组',
+                    status: '在线',
+                    joinDate: '2023-06-15',
+                    totalConversations: 156,
+                    satisfaction: 4.8,
+                    avgResponseTime: '45秒',
+                    todayConversations: 8,
+                    maxConcurrent: 15
+                },
+                'CS002': {
+                    name: '李小红',
+                    id: 'CS002',
+                    department: 'VIP客服组',
+                    status: '忙碌',
+                    joinDate: '2023-04-20',
+                    totalConversations: 289,
+                    satisfaction: 4.9,
+                    avgResponseTime: '32秒',
+                    todayConversations: 15,
+                    maxConcurrent: 15
+                },
+                'CS003': {
+                    name: '王大伟',
+                    id: 'CS003',
+                    department: '售后服务组',
+                    status: '离线',
+                    joinDate: '2023-02-10',
+                    totalConversations: 412,
+                    satisfaction: 4.6,
+                    avgResponseTime: '58秒',
+                    todayConversations: 0,
+                    maxConcurrent: 20
+                },
+                'CS004': {
+                    name: '刘小芳',
+                    id: 'CS004',
+                    department: '售前咨询组',
+                    status: '在线',
+                    joinDate: '2023-08-05',
+                    totalConversations: 98,
+                    satisfaction: 4.7,
+                    avgResponseTime: '41秒',
+                    todayConversations: 5,
+                    maxConcurrent: 12
+                },
+                'ADMIN': {
+                    name: '管理员',
+                    id: 'ADMIN',
+                    department: '管理组',
+                    status: '在线',
+                    joinDate: '2023-01-01',
+                    totalConversations: 0,
+                    satisfaction: '-',
+                    avgResponseTime: '-',
+                    todayConversations: 0,
+                    maxConcurrent: 10
+                }
+            };
+
+            const details = staffDetails[staffId];
+            if (details) {
+                const message = `
+客服详情信息：
+================
+姓名：${details.name}
+工号：${details.id}
+部门：${details.department}
+状态：${details.status}
+入职时间：${details.joinDate}
+
+工作统计：
+----------------
+累计接待：${details.totalConversations}人
+满意度：${details.satisfaction}${details.satisfaction !== '-' ? '⭐' : ''}
+平均响应时间：${details.avgResponseTime}
+今日接待：${details.todayConversations}人
+最大并发：${details.maxConcurrent}人
+                `;
+                alert(message);
+            }
+        }
+    </script>
+</body>
+</html>

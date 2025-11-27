@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服管理系统 - 主页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #718096;
+            margin-bottom: 50px;
+            font-size: 1.1em;
+        }
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .module-card {
+            background: linear-gradient(135deg, #fff 0%, #f7fafc 100%);
+            border-radius: 15px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+        .module-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        .module-title {
+            color: #2d3748;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .module-desc {
+            color: #718096;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        .admin-badge {
+            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>客服管理系统</h1>
+        <p class="subtitle">智能化客服管理平台，提升服务效率与质量</p>
+        
+        <div class="modules">
+            <div class="module-card" onclick="window.open('customer-service-list.html', '_blank')">
+                <div class="module-icon">👥</div>
+                <div class="module-title">客服列表</div>
+                <div class="module-desc">管理客服信息、状态监控、批量操作</div>
+            </div>
+            
+            <div class="module-card" onclick="window.open('service-workspace-normal.html', '_blank')">
+                <div class="module-icon">💬</div>
+                <div class="module-title">客服工作台</div>
+                <div class="module-desc">实时对话、快捷回复、状态切换</div>
+            </div>
+            
+            <div class="module-card" onclick="window.open('service-workspace-admin.html', '_blank')">
+                <div class="module-icon">👑</div>
+                <div class="module-title">管理员工作台<span class="admin-badge">管理员</span></div>
+                <div class="module-desc">全客服会话查看、转移分配、权限管理</div>
+            </div>
+            
+            <div class="module-card" onclick="window.open('admin-dashboard.html', '_blank')">
+                <div class="module-icon">📊</div>
+                <div class="module-title">数据概览<span class="admin-badge">管理员</span></div>
+                <div class="module-desc">数据统计、绩效分析、监控告警</div>
+            </div>
+            
+            <div class="module-card" onclick="window.open('service-config.html', '_blank')">
+                <div class="module-icon">⚙️</div>
+                <div class="module-title">客服配置<span class="admin-badge">管理员</span></div>
+                <div class="module-desc">超时提醒、消息模板、工作时段配置</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

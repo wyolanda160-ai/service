@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服配置 - 客服管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f7fafc;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        .admin-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+        }
+        .back-link:hover {
+            opacity: 1;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .config-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .config-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .time-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .config-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .config-card h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .help-text {
+            color: #718096;
+            font-size: 0.85em;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .time-slots {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .time-slot {
+            display: grid;
+            grid-template-columns: 200px 1fr auto;
+            gap: 15px;
+            align-items: center;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+        .weekday-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .weekday-chip {
+            padding: 6px 12px;
+            background: #e2e8f0;
+            border-radius: 15px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .weekday-chip.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .message-preview {
+            background: #f0f4f8;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 3px solid #667eea;
+        }
+        .message-preview-title {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .message-preview-content {
+            color: #2d3748;
+            font-style: italic;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>⚙️ 客服配置</h1>
+            <div>
+                <span class="admin-badge">超级管理员</span>
+                <a href="index.html" class="back-link">← 返回主页</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="config-tabs">
+            <div class="tab active" onclick="switchTab('messages')">💬 消息模板</div>
+            <div class="tab" onclick="switchTab('sensitive')">🚨 敏感词配置</div>
+            <div class="tab" onclick="switchTab('worktime')">🕐 工作时段</div>
+        </div>
+
+
+
+        <!-- 消息模板配置 -->
+        <div id="messages" class="tab-content">
+            <div class="config-section">
+                <div class="section-title">
+                    💬 欢迎语和结束语配置
+                </div>
+
+                <div class="config-card">
+                    <h4>人工客服欢迎语</h4>
+                    <div class="form-group">
+                        <label class="form-label">标准欢迎语</label>
+                        <textarea class="form-input form-textarea" id="humanWelcomeText">您好！我是{客服姓名}，很高兴为您服务。请问有什么可以帮助您的吗？</textarea>
+                        <div class="help-text">支持变量：{客服姓名}、{客服工号}、{用户昵称}</div>
+                        <div class="message-preview">
+                            <div class="message-preview-title">预览效果：</div>
+                            <div class="message-preview-content" id="humanWelcomePreview">您好！我是张小明，很高兴为您服务。请问有什么可以帮助您的吗？</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">VIP用户欢迎语</label>
+                        <textarea class="form-input form-textarea" id="vipWelcomeText">尊敬的VIP用户{用户昵称}，您好！我是金牌客服{客服姓名}，将为您提供专属优质服务。</textarea>
+                        <div class="help-text">VIP用户专属欢迎语，体现差异化服务</div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>AI客服欢迎语</h4>
+                    <div class="form-group">
+                        <label class="form-label">AI智能欢迎语</label>
+                        <textarea class="form-input form-textarea" id="aiWelcomeText">您好！我是智能客服小助手，很高兴为您服务。我可以帮您查询订单、处理售后、解答常见问题。如需人工服务，请回复"人工客服"。</textarea>
+                        <div class="help-text">AI客服首次接待用户的欢迎语</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">AI转人工触发词</label>
+                        <input type="text" class="form-input" value="人工客服,转人工,投诉,退款,复杂问题" id="aiTransferKeywords">
+                        <div class="help-text">当用户消息包含这些关键词时，AI会自动转接人工客服，多个关键词用逗号分隔</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">AI转人工话术</label>
+                        <textarea class="form-input form-textarea" id="aiToHumanText">正在为您转接人工客服，请稍等... 已为您优先分配金牌客服，预计等待时间{预计等待时间}分钟。</textarea>
+                        <div class="help-text">AI转人工时的标准话术</div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>结束语配置</h4>
+                    <div class="form-group">
+                        <label class="form-label">标准结束语</label>
+                        <textarea class="form-input form-textarea" id="standardEndText">感谢您的咨询，问题已经为您解决。如还有其他疑问，欢迎随时联系我们！</textarea>
+                        <div class="help-text">问题解决后的标准结束语</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">问题未解决结束语</label>
+                        <textarea class="form-input form-textarea" id="unsolvedEndText">您的问题我已经记录，将安排专人跟进处理。我们将在{处理时限}内给您回复，感谢您的理解。</textarea>
+                        <div class="help-text">问题未完全解决时的结束语</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">满意度邀请结束语</label>
+                        <textarea class="form-input form-textarea" id="satisfactionEndText">服务已结束，请对我的服务进行评价，您的满意是我们最大的动力！点击下方链接即可评价。</textarea>
+                        <div class="help-text">邀请用户进行满意度评价的结束语</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary">💾 保存配置</button>
+                    <button class="btn btn-secondary">🔄 恢复默认</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 敏感词配置 -->
+        <div id="sensitive" class="tab-content">
+            <div class="config-section">
+                <div class="section-title">
+                    🚨 敏感词预警配置
+                </div>
+
+                <div class="config-card">
+                    <h4>基础敏感词库</h4>
+                    <div class="form-group">
+                        <label class="form-label">投诉类敏感词（高级）</label>
+                        <input type="text" class="form-input" value="投诉,投诉到底,要投诉,投诉你们" id="complaintWords">
+                        <div class="help-text">多个词用逗号分隔，系统将实时监控对话中的这些词汇</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">退款类敏感词（中级）</label>
+                        <input type="text" class="form-input" value="退款,全额退款,退钱,退全款,要退款" id="refundWords">
+                        <div class="help-text">涉及退款相关的敏感词汇</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">法律风险类敏感词（高级）</label>
+                        <input type="text" class="form-input" value="报警,举报,工商,315,消协,法院,起诉" id="legalWords">
+                        <div class="help-text">涉及法律风险的敏感词汇，需要特别关注</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">服务质量类敏感词（中级）</label>
+                        <input type="text" class="form-input" value="欺诈,骗子,虚假宣传,坑人,不负责任" id="serviceWords">
+                        <div class="help-text">涉及服务质量问题的敏感词汇</div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>自定义敏感词</h4>
+                    <div class="form-group">
+                        <label class="form-label">添加自定义敏感词</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="text" class="form-input" placeholder="输入敏感词" id="customWord" style="flex: 1;">
+                            <select class="form-input" style="width: 200px;" id="customCategory">
+                                <option value="complaint">投诉类</option>
+                                <option value="refund">退款类</option>
+                                <option value="legal">法律风险类</option>
+                                <option value="service">服务质量类</option>
+                                <option value="custom">其他</option>
+                            </select>
+                            <select class="form-input" style="width: 120px;" id="customLevel">
+                                <option value="low">低级</option>
+                                <option value="medium">中级</option>
+                                <option value="high">高级</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="addCustomWord()">添加</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">自定义词库列表</label>
+                        <div style="max-height: 200px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px;" id="customWordList">
+                            <div style="padding: 8px; background: #f7fafc; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <span><span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">投诉类</span> 服务态度差</span>
+                                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8em;">删除</button>
+                            </div>
+                            <div style="padding: 8px; background: #f7fafc; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <span><span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">退款类</span> 必须退款</span>
+                                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8em;">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>预警设置</h4>
+                    <div class="form-group">
+                        <label class="form-label">预警级别</label>
+                        <select class="form-input" id="alertLevel">
+                            <option value="none">不预警</option>
+                            <option value="all">所有敏感词都预警</option>
+                            <option value="high">仅高风险敏感词预警</option>
+                            <option value="custom">指定级别预警</option>
+                        </select>
+                        <div class="help-text">设置触发预警的敏感词级别</div>
+                    </div>
+
+                    <div class="form-group" id="customAlertLevels" style="display: none;">
+                        <label class="form-label">选择预警级别</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="alertLow" value="low">
+                            <label for="alertLow">低级敏感词预警</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="alertMedium" value="medium">
+                            <label for="alertMedium">中级敏感词预警</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="alertHigh" value="high">
+                            <label for="alertHigh">高级敏感词预警</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">预警通知方式</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sensitiveEmail" checked>
+                            <label for="sensitiveEmail">邮件通知管理员</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sensitiveInternal" checked>
+                            <label for="sensitiveInternal">站内信提醒</label>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="config-card">
+                    <h4>词库管理</h4>
+                    <div class="btn-group">
+                        <button class="btn btn-primary">💾 保存配置</button>
+                        <button class="btn btn-secondary">🔄 恢复默认</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工作时段配置 -->
+        <div id="worktime" class="tab-content">
+            <div class="config-section">
+                <div class="section-title">
+                    🕐 人工客服工作时段配置
+                </div>
+
+                <div class="config-card">
+                    <h4>标准工作时段</h4>
+                    <div class="time-input-group">
+                        <div class="form-group">
+                            <label class="form-label">工作日上班时间</label>
+                            <input type="time" class="form-input" value="09:00" id="weekdayStart">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">工作日下班时间</label>
+                            <input type="time" class="form-input" value="18:00" id="weekdayEnd">
+                        </div>
+                    </div>
+
+                    <div class="time-input-group">
+                        <div class="form-group">
+                            <label class="form-label">周末上班时间</label>
+                            <input type="time" class="form-input" value="10:00" id="weekendStart">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">周末下班时间</label>
+                            <input type="time" class="form-input" value="17:00" id="weekendEnd">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-card">
+                    <h4>特殊工作时段</h4>
+                    <div class="form-group">
+                        <label class="form-label">适用工作日</label>
+                        <div class="weekday-selector">
+                            <div class="weekday-chip selected" data-day="1">周一</div>
+                            <div class="weekday-chip selected" data-day="2">周二</div>
+                            <div class="weekday-chip selected" data-day="3">周三</div>
+                            <div class="weekday-chip selected" data-day="4">周四</div>
+                            <div class="weekday-chip selected" data-day="5">周五</div>
+                            <div class="weekday-chip" data-day="6">周六</div>
+                            <div class="weekday-chip" data-day="0">周日</div>
+                        </div>
+                    </div>
+
+                    <div class="time-slots">
+                        <div class="time-slot">
+                            <input type="time" class="form-input" value="09:00">
+                            <input type="time" class="form-input" value="12:00">
+                            <button class="btn btn-danger">删除</button>
+                        </div>
+                        <div class="time-slot">
+                            <input type="time" class="form-input" value="14:00">
+                            <input type="time" class="form-input" value="18:00">
+                            <button class="btn btn-danger">删除</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addTimeSlot()">➕ 添加时间段</button>
+                </div>
+
+
+
+
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="aiBackup" checked>
+                    <label for="aiBackup">非工作时间AI客服接管</label>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary">💾 保存配置</button>
+                    <button class="btn btn-secondary">🔄 恢复默认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 激活当前标签
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // 实时预览功能
+        document.getElementById('humanWelcomeText').addEventListener('input', function() {
+            const preview = this.value.replace('{客服姓名}', '张小明').replace('{客服工号}', 'CS001').replace('{用户昵称}', '王先生');
+            document.getElementById('humanWelcomePreview').textContent = preview;
+        });
+
+        // 添加自定义敏感词
+        function addCustomWord() {
+            const word = document.getElementById('customWord').value.trim();
+            const category = document.getElementById('customCategory').value;
+            const level = document.getElementById('customLevel').value;
+            const categoryNames = {
+                'complaint': '投诉类',
+                'refund': '退款类', 
+                'legal': '法律风险类',
+                'service': '服务质量类',
+                'custom': '其他'
+            };
+            const levelNames = {
+                'low': '低级',
+                'medium': '中级',
+                'high': '高级'
+            };
+            const levelColors = {
+                'low': '#48bb78',
+                'medium': '#f6ad55', 
+                'high': '#f56565'
+            };
+            
+            if (!word) {
+                alert('请输入敏感词');
+                return;
+            }
+            
+            const wordList = document.getElementById('customWordList');
+            const newWord = document.createElement('div');
+            newWord.style.cssText = 'padding: 8px; background: #f7fafc; margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;';
+            newWord.innerHTML = `
+                <span>
+                    <span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">${categoryNames[category]}</span>
+                    <span style="background: ${levelColors[level]}; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 5px;">${levelNames[level]}</span>
+                    ${word}
+                </span>
+                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8em;" onclick="this.parentElement.remove()">删除</button>
+            `;
+            
+            wordList.appendChild(newWord);
+            document.getElementById('customWord').value = '';
+        }
+
+        // 敏感词输入框回车添加
+        document.getElementById('customWord').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addCustomWord();
+            }
+        });
+
+        // 工作日选择器
+        document.querySelectorAll('.weekday-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+
+        // 添加时间段
+        function addTimeSlot() {
+            const timeSlots = document.querySelector('.time-slots');
+            const newSlot = document.createElement('div');
+            newSlot.className = 'time-slot';
+            newSlot.innerHTML = `
+                <input type="time" class="form-input" value="09:00">
+                <input type="time" class="form-input" value="12:00">
+                <button class="btn btn-danger" onclick="this.parentElement.remove()">删除</button>
+            `;
+            timeSlots.appendChild(newSlot);
+        }
+
+        // 预警级别切换逻辑
+        document.getElementById('alertLevel').addEventListener('change', function() {
+            const customLevels = document.getElementById('customAlertLevels');
+            if (this.value === 'custom') {
+                customLevels.style.display = 'block';
+            } else {
+                customLevels.style.display = 'none';
+            }
+        });
+
+        // 保存配置（示例）
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 显示保存成功的提示
+                this.textContent = '✅ 已保存';
+                this.style.background = 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)';
+                
+                setTimeout(() => {
+                    this.textContent = '💾 保存配置';
+                    this.style.background = '';
+                }, 2000);
+            });
+        });
+
+
+
+        // 恢复默认设置
+        document.querySelectorAll('.btn-secondary').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('确定要恢复默认配置吗？当前设置将被覆盖。')) {
+                    location.reload();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

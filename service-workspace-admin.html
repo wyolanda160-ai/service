@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员工作台 - 客服管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f7fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .header h1 {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .status-selector {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        .admin-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+        }
+        .back-link:hover {
+            opacity: 1;
+        }
+        .workspace {
+            display: flex;
+            flex: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 70px);
+        }
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        .service-filter {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            background: white;
+            color: #2d3748;
+        }
+        .conversation-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f7fafc;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #718096;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .tab.active {
+            color: #ed8936;
+            background: white;
+        }
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+        }
+        .tab-badge {
+            background: #fc8181;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+        .user-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .user-list.hidden {
+            display: none;
+        }
+        .user-item {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-item:hover {
+            background: #f7fafc;
+        }
+        .user-item.active {
+            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+            color: white;
+        }
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-message {
+            font-size: 0.85em;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .unread-badge {
+            background: #fc8181;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        .vip-badge {
+            background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+        .service-tag {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.7em;
+            font-weight: 500;
+            margin-left: auto;
+        }
+        .transfer-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .transfer-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #fafbfc;
+        }
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+        }
+        .message-content {
+            max-width: 60%;
+        }
+        .message-bubble {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 4px;
+        }
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #f56565 0%, #ed8936 100%);
+            color: white;
+        }
+        .message-time {
+            font-size: 0.8em;
+            color: #718096;
+            text-align: right;
+        }
+        .message.user .message-time {
+            text-align: left;
+        }
+        .chat-input {
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px;
+        }
+        .input-area {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .message-input {
+            flex: 1;
+            min-height: 40px;
+            max-height: 120px;
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            resize: none;
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+        .input-tools {
+            display: flex;
+            gap: 8px;
+        }
+        .tool-btn {
+            padding: 8px 12px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        .tool-btn:hover {
+            background: #edf2f7;
+        }
+
+        .right-sidebar {
+            width: 320px;
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+        .user-profile {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 600;
+            color: white;
+        }
+        .profile-info {
+            text-align: center;
+        }
+        .profile-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        .profile-level {
+            color: #718096;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .stat-item {
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 0.8em;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .history-section {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .history-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4a5568;
+        }
+        .history-item {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .history-item:hover {
+            background: #edf2f7;
+        }
+        .history-date {
+            font-size: 0.85em;
+            color: #718096;
+            margin-bottom: 4px;
+        }
+        .history-preview {
+            font-size: 0.9em;
+            color: #2d3748;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>管理员工作台</h1>
+            <div class="header-controls">
+                <span>管理员 (ADMIN) <span class="admin-badge">超级管理员</span></span>
+                <select class="status-selector">
+                    <option>🟢 在线</option>
+                    <option>🟡 忙碌</option>
+                    <option>🔴 离线</option>
+                </select>
+                <a href="index.html" class="back-link">← 返回主页</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <input type="text" class="search-box" placeholder="搜索用户...">
+                <select class="service-filter" id="serviceFilter" onchange="filterByService()">
+                    <option value="all">所有客服会话</option>
+                    <option value="CS001">张小明 (CS001)</option>
+                    <option value="CS002">李小红 (CS002)</option>
+                    <option value="CS003">王大伟 (CS003)</option>
+                    <option value="CS004">刘小芳 (CS004)</option>
+                </select>
+            </div>
+            <div class="conversation-tabs">
+                <div class="tab active" onclick="switchTab('current')">
+                    当前会话
+                    <span class="tab-badge">5</span>
+                </div>
+                <div class="tab" onclick="switchTab('history')">
+                    历史记录
+                </div>
+            </div>
+            <div id="current-conversations" class="user-list">
+                <div class="user-item active" data-service="CS001">
+                    <div class="user-avatar">用</div>
+                    <div class="user-info">
+                        <div class="user-name">
+                            王先生
+                            <span class="vip-badge">VIP</span>
+                            <span class="service-tag">张小明</span>
+                        </div>
+                        <div class="user-message">请问订单什么时候发货？</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                        <span class="unread-badge">3</span>
+                        <button class="transfer-btn" onclick="transferConversation('王先生', 'CS001')">转移</button>
+                    </div>
+                </div>
+                
+                <div class="user-item" data-service="CS001">
+                    <div class="user-avatar">张</div>
+                    <div class="user-info">
+                        <div class="user-name">张先生</div>
+                        <div class="user-message">我想退款</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                        <span class="unread-badge">1</span>
+                        <button class="transfer-btn" onclick="transferConversation('张先生', 'CS001')">转移</button>
+                    </div>
+                </div>
+                
+                <div class="user-item" data-service="CS002">
+                    <div class="user-avatar">陈</div>
+                    <div class="user-info">
+                        <div class="user-name">
+                            陈女士
+                            <span class="vip-badge">VIP</span>
+                            <span class="service-tag">李小红</span>
+                        </div>
+                        <div class="user-message">产品很满意</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                        <button class="transfer-btn" onclick="transferConversation('陈女士', 'CS002')">转移</button>
+                    </div>
+                </div>
+                
+                <div class="user-item" data-service="CS003">
+                    <div class="user-avatar">李</div>
+                    <div class="user-info">
+                        <div class="user-name">李女士</div>
+                        <div class="user-message">咨询售后问题</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                        <button class="transfer-btn" onclick="transferConversation('李女士', 'CS003')">转移</button>
+                    </div>
+                </div>
+                
+                <div class="user-item" data-service="CS004">
+                    <div class="user-avatar">赵</div>
+                    <div class="user-info">
+                        <div class="user-name">赵先生</div>
+                        <div class="user-message">物流查询</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-end;">
+                        <button class="transfer-btn" onclick="transferConversation('赵先生', 'CS004')">转移</button>
+                    </div>
+                </div>
+            </div>
+            <div id="history-conversations" class="user-list hidden">
+                <div class="user-item" data-service="CS001">
+                    <div class="user-avatar">李</div>
+                    <div class="user-info">
+                        <div class="user-name">李女士</div>
+                        <div class="user-message">收到了，谢谢！</div>
+                    </div>
+                    <span class="service-tag">张小明</span>
+                </div>
+                
+                <div class="user-item" data-service="CS002">
+                    <div class="user-avatar">赵</div>
+                    <div class="user-info">
+                        <div class="user-name">赵先生</div>
+                        <div class="user-message">咨询产品价格</div>
+                    </div>
+                    <span class="service-tag">李小红</span>
+                </div>
+                
+                <div class="user-item" data-service="CS003">
+                    <div class="user-avatar">孙</div>
+                    <div class="user-info">
+                        <div class="user-name">孙女士</div>
+                        <div class="user-message">已解决，感谢</div>
+                    </div>
+                    <span class="service-tag">王大伟</span>
+                </div>
+                
+                <div class="user-item" data-service="CS004">
+                    <div class="user-avatar">周</div>
+                    <div class="user-info">
+                        <div class="user-name">周先生</div>
+                        <div class="user-message">物流查询</div>
+                    </div>
+                    <span class="service-tag">刘小芳</span>
+                </div>
+                
+                <div class="user-item" data-service="CS002">
+                    <div class="user-avatar">吴</div>
+                    <div class="user-info">
+                        <div class="user-name">
+                            吴女士
+                            <span class="vip-badge">VIP</span>
+                        </div>
+                        <div class="user-message">售后服务申请</div>
+                    </div>
+                    <span class="service-tag">李小红</span>
+                </div>
+                
+                <div class="user-item" data-service="CS001">
+                    <div class="user-avatar">郑</div>
+                    <div class="user-info">
+                        <div class="user-name">郑先生</div>
+                        <div class="user-message">订单修改</div>
+                    </div>
+                    <span class="service-tag">张小明</span>
+                </div>
+                
+                <div class="user-item" data-service="CS003">
+                    <div class="user-avatar">王</div>
+                    <div class="user-info">
+                        <div class="user-name">王女士</div>
+                        <div class="user-message">投诉建议</div>
+                    </div>
+                    <span class="service-tag">王大伟</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-area">
+                <div class="chat-header">
+                    <div class="chat-user-info">
+                        <div class="user-avatar">用</div>
+                        <div>
+                            <div class="user-name">王先生 <span class="vip-badge">VIP</span></div>
+                            <div style="color: #718096; font-size: 0.9em;">用户ID: U2024001 | 当前客服: 张小明</div>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="btn btn-secondary">👁️ 查看详情</button>
+                        <button class="btn btn-success">🔄 重新分配</button>
+                    </div>
+                </div>
+
+                <div class="messages">
+                    <div class="message">
+                        <div class="message-avatar">用</div>
+                        <div class="message-content">
+                            <div class="message-bubble">你好，我想查询一下我的订单状态</div>
+                            <div class="message-time">14:23:15</div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">客服</div>
+                        <div class="message-content">
+                            <div class="message-bubble">张小明：您好！请提供一下您的订单号，我帮您查询</div>
+                            <div class="message-time">14:23:22</div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">用</div>
+                        <div class="message-content">
+                            <div class="message-bubble">订单号是：ORD20241125001</div>
+                            <div class="message-time">14:23:35</div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">客服</div>
+                        <div class="message-content">
+                            <div class="message-bubble">张小明：好的，我查到了。您的订单已经打包完成，预计明天上午发货，后天就能送达</div>
+                            <div class="message-time">14:23:48</div>
+                        </div>
+                    </div>
+                    
+                    <div class="message">
+                        <div class="message-avatar">用</div>
+                        <div class="message-content">
+                            <div class="message-bubble">请问订单什么时候发货？</div>
+                            <div class="message-time">14:24:02</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input">
+                    <div class="input-area">
+                        <textarea class="message-input" placeholder="管理员消息..." style="border-color: #fed7d7;"></textarea>
+                        <div class="input-tools">
+                            <button class="tool-btn">📎</button>
+                            <button class="tool-btn">😊</button>
+                            <button class="tool-btn">📷</button>
+                            <button class="btn btn-primary">以管理员身份发送</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="right-sidebar">
+            <div class="user-profile">
+                <div class="profile-header">
+                    <div class="profile-avatar">王</div>
+                    <div class="profile-info">
+                        <div class="profile-name">王先生</div>
+                        <div class="profile-level">VIP会员 | 负责客服: 张小明</div>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">累计订单</div>
+                        <div class="stat-value">28</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">消费金额</div>
+                        <div class="stat-value">¥8,520</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <div class="history-title">会话历史记录</div>
+                <div class="history-item">
+                    <div class="history-date">2024-11-20 10:30 | 客服: 张小明</div>
+                    <div class="history-preview">咨询退款流程</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-date">2024-11-18 15:20 | 客服: 李小红</div>
+                    <div class="history-preview">修改收货地址</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-date">2024-11-15 09:15 | 客服: 王大伟</div>
+                    <div class="history-preview">产品使用问题咨询</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabType) {
+            // 移除所有标签的active类
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 隐藏所有用户列表
+            document.querySelectorAll('.user-list').forEach(list => {
+                list.classList.add('hidden');
+            });
+            
+            // 激活当前标签
+            if (tabType === 'current') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document.getElementById('current-conversations').classList.remove('hidden');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document.getElementById('history-conversations').classList.remove('hidden');
+            }
+        }
+        
+        function filterByService() {
+            const selectedService = document.getElementById('serviceFilter').value;
+            const allItems = document.querySelectorAll('.user-item');
+            
+            allItems.forEach(item => {
+                const serviceId = item.getAttribute('data-service');
+                if (selectedService === 'all' || serviceId === selectedService) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        function transferConversation(userName, currentService) {
+            const services = {
+                'CS001': '张小明',
+                'CS002': '李小红', 
+                'CS003': '王大伟',
+                'CS004': '刘小芳'
+            };
+            
+            const currentServiceName = services[currentService];
+            const targetServices = Object.entries(services).filter(([id, name]) => id !== currentService);
+            
+            const options = targetServices.map(([id, name]) => `<option value="${id}">${name}</option>`).join('');
+            
+            const modal = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+                    <div style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; width: 90%;">
+                        <h3 style="margin-bottom: 20px; color: #2d3748;">转移会话</h3>
+                        <p style="margin-bottom: 20px; color: #718096;">
+                            将 ${userName} 的会话从 <strong>${currentServiceName}</strong> 转移给：
+                        </p>
+                        <select id="targetService" style="width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px;">
+                            <option value="">请选择目标客服</option>
+                            ${options}
+                        </select>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button onclick="closeTransferModal()" style="padding: 10px 20px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer;">取消</button>
+                            <button onclick="confirmTransfer('${userName}', '${currentService}')" style="padding: 10px 20px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 8px; cursor: pointer;">确认转移</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+        
+        function closeTransferModal() {
+            const modal = document.querySelector('[style*="position: fixed"]');
+            if (modal) modal.remove();
+        }
+        
+        function confirmTransfer(userName, fromService) {
+            const targetService = document.getElementById('targetService').value;
+            if (!targetService) {
+                alert('请选择目标客服');
+                return;
+            }
+            
+            const services = {
+                'CS001': '张小明',
+                'CS002': '李小红', 
+                'CS003': '王大伟',
+                'CS004': '刘小芳'
+            };
+            
+            alert(`会话转移成功！\n${userName} 的会话已从 ${services[fromService]} 转移给 ${services[targetService]}`);
+            closeTransferModal();
+        }
+        
+        // 用户项点击事件
+        document.querySelectorAll('.user-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // 如果点击的是转移按钮，不触发用户项的点击事件
+                if (e.target.classList.contains('transfer-btn')) {
+                    return;
+                }
+                
+                // 移除所有用户项的active类
+                document.querySelectorAll('.user-item').forEach(userItem => {
+                    userItem.classList.remove('active');
+                });
+                
+                // 添加active类到当前点击的用户项
+                this.classList.add('active');
+                
+                // 清除未读消息标记（如果是当前会话标签）
+                const unreadBadge = this.querySelector('.unread-badge');
+                if (unreadBadge && this.closest('#current-conversations')) {
+                    unreadBadge.style.display = 'none';
+                    
+                    // 更新标签上的未读数量
+                    const currentTabBadge = document.querySelector('.tab-badge');
+                    const currentCount = parseInt(currentTabBadge.textContent) - 1;
+                    currentTabBadge.textContent = currentCount > 0 ? currentCount : '';
+                    if (currentCount === 0) {
+                        currentTabBadge.style.display = 'none';
+                    }
+                }
+            });
+        });
+        
+        // 页面加载时自动应用当前筛选
+        window.addEventListener('load', function() {
+            filterByService();
+        });
+    </script>
+</body>
+</html>
